@@ -11,8 +11,9 @@ root = Tk()
 drawpad = Canvas(root, width=800,height=600, background='white')
 rocket1 = drawpad.create_rectangle(400,585,405,590)
 player = drawpad.create_oval(390,580,410,600, fill="blue")
-enemy = drawpad.create_rectangle(50,50,100,60, fill="red")
+enemy = drawpad.create_rectangle(50,50,120,100, fill="red")
 rocket1Fired = False
+rockethittarget = False
 
 direction = 5
 
@@ -56,17 +57,53 @@ class myApp(object):
         elif x1 < 0:
             direction = 5
         drawpad.move(enemy, direction, 0)
+        self.collisionDetect(rocket1)
+        if rocket1Fired == True:
+            drawpad.move(rocket1,0,-5)
+        if rocket1 < 0:
+            drawpad.move(rocket1, rx1-x1)
         drawpad.after(5,self.animate)
+      
 
     def key(self,event):
         global player
         global rocket1Fired
+        x1,y1,x2,y2 = drawpad.coords(player)
         if event.char == "w":
             drawpad.move(player,0,-4)
             drawpad.move(rocket1,0,-4)
-            
-    
+        if event.char == "a":
+            drawpad.move(player,-4,0)
+            drawpad.move(rocket1,-4,0)
+        if event.char == "s":
+            drawpad.move(player,0,4)
+            drawpad.move(rocket1,0,4)
+        if event.char == "d":
+            drawpad.move(player,4,0)
+            drawpad.move(rocket1,4,0)                         
+        if event.char == " ":
+            rocket1Fired = True                       
+        if x2 > 800:
+            drawpad.move(player,-4,0)
+        if x1 < 0:
+            drawpad.move(player,4,0)                                                                           
+        if y2 > 599:
+            drawpad.move(player,0,-4)
+                                                                                                                                                                                                                                                
     def collisionDetect(self, rocket):
-        rx1,ry1,rx2,ry2 = drawpad.coords(rocket)
+       global drawpad
+       global rocket1
+       global rocket1Fired
+       global player
+       rx1,ry1,rx2,ry2 = drawpad.coords(rocket) 
+       x1,y1,x2,y2 = drawpad.coords(player)
+       ex1,ey1,ex2,ey2 = drawpad.coords(enemy)       
+       if ry2 < 0:           
+           drawpad.move(rocket1,x1-rx1+7.5,y1-ry1+15)
+           rocket1Fired = False 
+       if rx1 > ex1 and rx1 < ex2 + 1 and ry1 > ey1 and ry1 < ey2+1 :
+            drawpad.delete(enemy)
+            drawpad.move(rocket1,x1-rx1+7.5,y1-ry1+15)
+
 app = myApp(root)
 root.mainloop()
